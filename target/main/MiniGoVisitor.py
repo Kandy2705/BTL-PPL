@@ -14,11 +14,6 @@ class MiniGoVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniGoParser#array_type.
-    def visitArray_type(self, ctx:MiniGoParser.Array_typeContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by MiniGoParser#struct_type.
     def visitStruct_type(self, ctx:MiniGoParser.Struct_typeContext):
         return self.visitChildren(ctx)
@@ -59,8 +54,18 @@ class MiniGoVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniGoParser#local_variable.
+    def visitLocal_variable(self, ctx:MiniGoParser.Local_variableContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniGoParser#global_constant.
     def visitGlobal_constant(self, ctx:MiniGoParser.Global_constantContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniGoParser#local_constant.
+    def visitLocal_constant(self, ctx:MiniGoParser.Local_constantContext):
         return self.visitChildren(ctx)
 
 
@@ -84,8 +89,28 @@ class MiniGoVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by MiniGoParser#dot_assignment.
+    def visitDot_assignment(self, ctx:MiniGoParser.Dot_assignmentContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniGoParser#list_arr_index.
+    def visitList_arr_index(self, ctx:MiniGoParser.List_arr_indexContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniGoParser#arr_index.
+    def visitArr_index(self, ctx:MiniGoParser.Arr_indexContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by MiniGoParser#if_else.
     def visitIf_else(self, ctx:MiniGoParser.If_elseContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniGoParser#else_if.
+    def visitElse_if(self, ctx:MiniGoParser.Else_ifContext):
         return self.visitChildren(ctx)
 
 
@@ -159,11 +184,6 @@ class MiniGoVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by MiniGoParser#list_expression.
-    def visitList_expression(self, ctx:MiniGoParser.List_expressionContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by MiniGoParser#expr.
     def visitExpr(self, ctx:MiniGoParser.ExprContext):
         return self.visitChildren(ctx)
@@ -196,6 +216,11 @@ class MiniGoVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by MiniGoParser#expr6.
     def visitExpr6(self, ctx:MiniGoParser.Expr6Context):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by MiniGoParser#expr7.
+    def visitExpr7(self, ctx:MiniGoParser.Expr7Context):
         return self.visitChildren(ctx)
 
 

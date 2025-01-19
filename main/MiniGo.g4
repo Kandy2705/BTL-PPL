@@ -24,59 +24,62 @@ options{
 	language = Python3;
 }
 
-program: (NEWLINE* (array_literal | struct_literal | list_expression | global_variable
-            | array_type | global_constant | function | struct_type | initialize_struct
-            | interface_type | struct_func) NEWLINE*)* EOF;
+program: (NEWLINE* (array_literal | struct_literal | func_call | global_variable
+             | global_constant | function | struct_type | initialize_struct
+            | interface_type | struct_func) NEWLINE*)* EOF; // day
 
 //TODO: PARSE
 
 // sup_bool: NOT | AND | OR;
 // sup_int_float: ADD | SUB | MUL | DIV | MOD | EQ | NE | LT | LE | GT | GE;
 
-array_type: VAR ('arr' | 'multi arr') type_array (SEMICOLON NEWLINE* | NEWLINE+)
-;
+// array_type: VAR ('arr' | 'multi arr') type_array (SEMICOLON NEWLINE* | NEWLINE+)
+// ;
 
-struct_type: TYPE ID STRUCT LBRACE NEWLINE* data_struct NEWLINE* RBRACE;
+struct_type: TYPE ID STRUCT LBRACE NEWLINE* data_struct NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
 data_struct: (ID type_data (SEMICOLON NEWLINE* | NEWLINE+)) data_struct | ;
 initialize_struct: ID COLONASSIGN ((ID list_expr) | (INT_DEC | INT_BIN | INT_OCT | INT_HEX));
 
-interface_type: TYPE ID INTERFACE LBRACE NEWLINE* data_inter NEWLINE* RBRACE;
+interface_type: TYPE ID INTERFACE LBRACE NEWLINE* data_inter NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
 data_inter: (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)) data_inter | ; 
 initialize_inter: ID LPAREN (data_inter_thamso | ) RPAREN;
 data_inter_thamso: (ID (type_data | )) COMMA data_inter_thamso | (ID (type_data | ));
 
-global_variable: VAR ID ((type_data ((ASSIGN (expr | array_literal)) | )) | (ASSIGN (expr | array_literal))) (SEMICOLON NEWLINE* | NEWLINE+)
-;
+global_variable: VAR ID ((type_data ((ASSIGN (expr)) | )) | (ASSIGN (expr))) SEMICOLON NEWLINE*;
+local_variable: VAR ID ((type_data ((ASSIGN (expr)) | )) | (ASSIGN (expr)));
 
+global_constant: CONST ID ASSIGN (expr) SEMICOLON NEWLINE*;
+local_constant: CONST ID ASSIGN (expr);
 
-global_constant: CONST ID ASSIGN ((INT_DEC | INT_BIN | INT_OCT | INT_HEX) | STRING_LIT | FLOAT_LIT | TRUE | FALSE | expr | struct_literal | array_literal) (SEMICOLON NEWLINE* | NEWLINE+)
-;
 
 function: FUNC ID LPAREN (data_func | ) RPAREN (list_type_arr | ) (type_data | ) LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 data_func: (ID type_data) COMMA data_func | (ID type_data);
-body_func: ((assignment_func | if_else | RETURN (func_call | expr | ) | array_type | global_variable | global_constant | for_basic | for_icu | for_range
-                | func_call | BREAK | CONTINUE)
-            (SEMICOLON NEWLINE* | NEWLINE+)) body_func | ;
+body_func: ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
+                | func_call | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)) body_func | ; //day
 
-assignment_func: (ID | ID list_type_arr | ID DOT (ID | func_call | (ID list_type_arr)))
+assignment_func: (ID | ID arr_index | ID (list_arr_index | ) dot_assignment)
              (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
              expr) | );
+dot_assignment: DOT (ID | (ID list_type_arr)) dot_assignment | DOT (ID | (ID list_type_arr));
+list_arr_index: arr_index list_arr_index | arr_index;
+arr_index: LBRACKET expr RBRACKET;
 
 
 if_else: IF  LPAREN  expr  RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE NEWLINE* 
-        (ELSE IF  LPAREN expr RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE | ) NEWLINE* (ELSE NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE | );
+        (else_if | ) NEWLINE* (ELSE NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE | );
 
+else_if: (ELSE IF  LPAREN expr RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE) else_if | (ELSE IF  LPAREN expr RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE);
 
 for_basic: FOR expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
-for_icu: FOR initialize_struct SEMICOLON expr SEMICOLON assignment_func LBRACE NEWLINE* body_func NEWLINE* RBRACE;
-for_range: FOR (ID | '_') COMMA ID COLONASSIGN RANGE ID LBRACE NEWLINE* body_func NEWLINE* RBRACE;
+for_icu: FOR (initialize_struct | local_variable) SEMICOLON expr SEMICOLON assignment_func LBRACE NEWLINE* body_func NEWLINE* RBRACE;
+for_range: FOR (ID | '_') COMMA ID COLONASSIGN RANGE expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 
 struct_func: FUNC LPAREN ID ID RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE;
 func_call_str: ID LPAREN (func_call_thamso_str |  ) RPAREN;
 func_call_thamso_str: (ID type_data) COMMA func_call_thamso_str | (ID type_data);
 
 array_literal: type_array list_expr;
-type_array: list_type_arr type_data;
+type_array: list_type_arr (type_data);
 list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET);
 list_expr: LBRACE (data_list_expr)  RBRACE;
 data_list_expr: ((INT_DEC | INT_BIN | INT_OCT | INT_HEX) | STRING_LIT | LBRACE expr RBRACE | list_expr) COMMA data_list_expr | ((INT_DEC | INT_BIN | INT_OCT | INT_HEX) | STRING_LIT | LBRACE expr RBRACE | list_expr);
@@ -85,17 +88,18 @@ type_data: ID | INT | FLOAT | BOOLEAN | STRING | type_array;
 struct_literal: ((ID DOT) | )ID LBRACE (list_elements | ) RBRACE;
 list_elements: (ID COLON expr) COMMA list_elements | (ID COLON expr);
 
-list_expression: expr COMMA list_expression | expr;
+//list_expression: expr COMMA list_expression | expr;
 expr: expr OR expr1 | expr1;
 expr1: expr1 AND expr2 | expr2;
 expr2: expr2 (LT | LE | GT | GE | EQ | NE) expr3 | expr3;
 expr3: expr3 (ADD | SUB) expr4 | expr4;
 expr4: expr4 (MUL | DIV | MOD) expr5 | expr5;
-expr5: (NOT | SUB) expr6 | expr6;
-expr6: expr6 (DOT expr | LBRACKET expr RBRACKET) | ID | (INT_DEC | INT_BIN | INT_OCT | INT_HEX) | FLOAT_LIT | LPAREN expr RPAREN | ID LPAREN list_expression? RPAREN | 
-        func_call | STRING_LIT;
+expr5: (NOT | SUB) expr | expr6;
+expr6: expr6 (DOT expr | LBRACKET expr RBRACKET) | expr7;
+expr7: ID | INT_DEC | INT_BIN | INT_OCT | INT_HEX | FLOAT_LIT | LPAREN expr RPAREN | 
+        func_call | STRING_LIT | struct_literal | array_literal | TRUE | FALSE;
 
-func_call: ID LPAREN (func_call_thamso |  ) RPAREN;
+func_call: ((ID (list_arr_index | ) DOT) | ) ID LPAREN (func_call_thamso |  ) RPAREN;
 func_call_thamso: expr COMMA func_call_thamso | expr;
 
 // ! ---------------- LEXER DEADLINE PASS 13 TEST CASE 23:59 16/1 ----------------------- */

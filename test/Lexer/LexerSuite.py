@@ -74,3 +74,15 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test(""" 
             const a = 2;
 ""","\n,const,a,=,2,;,\n,<EOF>", inspect.stack()[0].function))
+
+    def test_017(self):
+        """skip"""
+        self.assertTrue(TestLexer.test("\t\f\r ", "<EOF>", inspect.stack()[0].function))
+
+    def test_030(self):
+        """INT_LIT"""
+        self.assertTrue(TestLexer.test("0452.", "0,452.,<EOF>", inspect.stack()[0].function))
+
+    def test_050(self):
+        """FLOAT_LIT"""
+        self.assertTrue(TestLexer.test("010.010e-020", "0,10.010e-0,20,<EOF>", inspect.stack()[0].function))

@@ -38,18 +38,18 @@ array_type: VAR ('arr' | 'multi arr') type_array (SEMICOLON NEWLINE* | NEWLINE+)
 
 struct_type: TYPE ID STRUCT LBRACE NEWLINE* data_struct NEWLINE* RBRACE;
 data_struct: (ID type_data (SEMICOLON NEWLINE* | NEWLINE+)) data_struct | ;
-initialize_struct: ID COLONASSIGN ((ID list_expr) | INTEGER_LIT);
+initialize_struct: ID COLONASSIGN ((ID list_expr) | (INT_DEC | INT_BIN | INT_OCT | INT_HEX));
 
 interface_type: TYPE ID INTERFACE LBRACE NEWLINE* data_inter NEWLINE* RBRACE;
 data_inter: (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)) data_inter | ; 
 initialize_inter: ID LPAREN (data_inter_thamso | ) RPAREN;
 data_inter_thamso: (ID (type_data | )) COMMA data_inter_thamso | (ID (type_data | ));
 
-global_variable: VAR ID ((type_data ((ASSIGN expr) | )) | (ASSIGN expr)) (SEMICOLON NEWLINE* | NEWLINE+)
+global_variable: VAR ID ((type_data ((ASSIGN (expr | array_literal)) | )) | (ASSIGN (expr | array_literal))) (SEMICOLON NEWLINE* | NEWLINE+)
 ;
 
 
-global_constant: CONST ID ASSIGN (INTEGER_LIT | STRING_LIT | FLOAT_LIT | TRUE | FALSE | expr | struct_literal | array_literal) (SEMICOLON NEWLINE* | NEWLINE+)
+global_constant: CONST ID ASSIGN ((INT_DEC | INT_BIN | INT_OCT | INT_HEX) | STRING_LIT | FLOAT_LIT | TRUE | FALSE | expr | struct_literal | array_literal) (SEMICOLON NEWLINE* | NEWLINE+)
 ;
 
 function: FUNC ID LPAREN (data_func | ) RPAREN (list_type_arr | ) (type_data | ) LBRACE NEWLINE* body_func NEWLINE* RBRACE;
@@ -77,9 +77,9 @@ func_call_thamso_str: (ID type_data) COMMA func_call_thamso_str | (ID type_data)
 
 array_literal: type_array list_expr;
 type_array: list_type_arr type_data;
-list_type_arr: (LBRACKET INTEGER_LIT RBRACKET) list_type_arr | (LBRACKET INTEGER_LIT RBRACKET);
-list_expr: LBRACE (data_list_expr | )  RBRACE;
-data_list_expr: (INTEGER_LIT | STRING_LIT | LBRACE expr RBRACE | list_expr) COMMA data_list_expr | (INTEGER_LIT | STRING_LIT | LBRACE expr RBRACE | list_expr);
+list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET);
+list_expr: LBRACE (data_list_expr)  RBRACE;
+data_list_expr: ((INT_DEC | INT_BIN | INT_OCT | INT_HEX) | STRING_LIT | LBRACE expr RBRACE | list_expr) COMMA data_list_expr | ((INT_DEC | INT_BIN | INT_OCT | INT_HEX) | STRING_LIT | LBRACE expr RBRACE | list_expr);
 type_data: ID | INT | FLOAT | BOOLEAN | STRING | type_array;
 
 struct_literal: ((ID DOT) | )ID LBRACE (list_elements | ) RBRACE;
@@ -92,7 +92,7 @@ expr2: expr2 (LT | LE | GT | GE | EQ | NE) expr3 | expr3;
 expr3: expr3 (ADD | SUB) expr4 | expr4;
 expr4: expr4 (MUL | DIV | MOD) expr5 | expr5;
 expr5: (NOT | SUB) expr6 | expr6;
-expr6: expr6 (DOT expr | LBRACKET expr RBRACKET) | ID | INTEGER_LIT | FLOAT_LIT | LPAREN expr RPAREN | ID LPAREN list_expression? RPAREN | 
+expr6: expr6 (DOT expr | LBRACKET expr RBRACKET) | ID | (INT_DEC | INT_BIN | INT_OCT | INT_HEX) | FLOAT_LIT | LPAREN expr RPAREN | ID LPAREN list_expression? RPAREN | 
         func_call | STRING_LIT;
 
 func_call: ID LPAREN (func_call_thamso |  ) RPAREN;
@@ -166,8 +166,8 @@ COMMA: ',';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
 //TODO Literals 3.3.5 pdf
-FLOAT_LIT: [0-9]+ DOT [0-9]* ([eE][+-]?[0-9]+)?;
-INTEGER_LIT: INT_DEC | INT_BIN | INT_OCT | INT_HEX;
+FLOAT_LIT: INT_DEC DOT [0-9]* ([eE][+-]?INT_DEC)?;
+//INTEGER_LIT: INT_DEC | INT_BIN | INT_OCT | INT_HEX;
 INT_DEC: [0-9] | [1-9][0-9]+{
     self.text = str(int(self.text, 10))
 };
@@ -206,7 +206,7 @@ BOOLEAN_LIT: TRUE | FALSE;
 COMMENTS: '/*' (COMMENTS|.)*? '*/' -> skip;
 COMMENTS_LINE: '//' ~[\r\n]* -> skip;
 NEWLINE   : [\r\n]+;
-WS: [ \t\f]+ -> skip; // skip spaces, tabs 
+WS: [ \t\f\r]+ -> skip; // skip spaces, tabs 
 
 //TODO ERROR pdf BTL1 + lexererr.py
 ERROR_CHAR: . {raise ErrorToken(self.text)};

@@ -174,3 +174,9 @@ class ParserSuite(unittest.TestCase):
              }
                                         
         ""","successful", inspect.stack()[0].function))
+
+    def test_022(self):
+        """invalid_array_declaration"""
+        self.assertTrue(TestParser.test("""    
+            var z VOTIEN = [2]int{};                           
+        ""","Error on line 2 col 34: }", inspect.stack()[0].function))

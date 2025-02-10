@@ -24,9 +24,10 @@ options{
 	language = Python3;
 }
 
-program: (NEWLINE* (array_literal | struct_literal | func_call | global_variable
-             | global_constant | function | struct_type | initialize_struct
-            | interface_type | struct_func) NEWLINE*)* EOF; // day
+// program: (NEWLINE* (array_literal | struct_literal | func_call | global_variable
+//              | global_constant | function | struct_type | initialize_struct
+//             | interface_type | struct_func) NEWLINE*)* EOF; // day
+program: NEWLINE* func_call_thamso EOF;
 
 //TODO: PARSE
 
